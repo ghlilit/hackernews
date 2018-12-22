@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import axios from 'axios'
+import axios from 'axios';
 import './App.css';
+import PropTypes from 'prop-types';
 
 const DEFAULT_QUERY = 'redux';
 const PATH_BASE = 'https://hn.algolia.com/api/v1';
@@ -116,6 +117,11 @@ const Search = ({ value, onChange, onSubmit, children }) =>
       </button>
   </form>
 
+Search.PropTypes = {
+   value: PropTypes.string,
+   onChange: PropTypes.func.isRequired,
+   onSubmit: PropTypes.func.isRequired,
+}
   
   const Table = ({ list, onDismiss }) => 
     <div className="table">
@@ -143,8 +149,21 @@ const Search = ({ value, onChange, onSubmit, children }) =>
         </div>
       )};
     </div>
+
+    Table.PropTypes = {
+      list: PropTypes.arrayOf(
+        PropTypes.shape({
+          objectID: PropTypes.string.isRequired,
+          url:PropTypes.string,
+          author:PropTypes.string,
+          num_comments:PropTypes.number,
+          points:PropTypes.number,
+        }).isRequired
+      ),
+      onDismiss: PropTypes.func.isRequired,
+    }
     
-const Button = ({onClick, className = 'btn btn-primary btn-lg', children}) =>
+const Button = ({onClick, className , children}) =>
   <button 
     onClick = {onClick}
     className = {className}
@@ -152,4 +171,14 @@ const Button = ({onClick, className = 'btn btn-primary btn-lg', children}) =>
     {children}
   </button>
 
+Button.defaultProps = {
+  className = 'btn btn-default'
+}
+Button.PropTypes = {
+  onClick: PropTypes.func.isRequired,
+  className: PropTypes.string,
+  children: PropTypes.node.isRequired,
+}
 export default App;
+
+export {Button, Search, Table};
