@@ -14,7 +14,8 @@ class App extends Component {
     results: null,
     searchKey: '',
     searchTerm: DEFAULT_QUERY,
-    error: null
+    error: null,
+    isLoading: false
   }
 
   needsToSearchTopStories(searchTerm){
@@ -22,9 +23,9 @@ class App extends Component {
   }
 
   fetchSearchTopStories(searchTerm, page = 0) {
-    fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}`)
-    .then(response => response.json())
-    .then(result => this.setSearchTopStories(result))
+    this.setState({isLoading:true})
+    axios(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}`)
+    .then(result => this.setSearchTopStories(result.data))
     .catch(error => this.setState({ error }));
   }
   
@@ -45,6 +46,7 @@ class App extends Component {
     : [];
     const updatedHits = [...oldHits, ...hits]
     this.setState({
+      isLoading:false,
       results: {
         ...results,
         [searchKey]: { hits: updatedHits, page }
@@ -64,7 +66,6 @@ class App extends Component {
   }
     
   onSearchChange = (event) => {
-      const { searchTerm } = this.state;
       this.setState({searchTerm: event.target.value})
   }
 
@@ -75,7 +76,7 @@ class App extends Component {
   }
     
   render() {
-    const {searchTerm, results, searchKey, error} = this.state;
+    const {searchTerm, results, searchKey, error, isLoading} = this.state;
     const page = (results && results[searchKey] && results[searchKey].page) || 0 ;
     const list = (results && results[searchKey] && results[searchKey].hits) || [] ;
     return (
@@ -96,9 +97,11 @@ class App extends Component {
           list = {list}
           onDismiss = {this.onDismiss} />}
           <div className = "text-center">
-            <Button onClick = {() => this.fetchSearchTopStories(searchKey, page + 1)}>
-              More
-            </Button>
+            <ButtonWithLoading 
+            isLoading = {isLoading}
+            onClick = {() => this.fetchSearchTopStories(searchKey, page + 1)}>
+            More
+            </ButtonWithLoading>
           </div>
           <br/> <br/>
       </div>
@@ -106,18 +109,30 @@ class App extends Component {
   }
 }
 
-const Search = ({ value, onChange, onSubmit, children }) =>
-  <form onSubmit={onSubmit}>
-    <input
-      type="text"
-      value={value}
-      onChange={onChange}/>
-      <button type="submit">
-        {children}
-      </button>
-  </form>
-
-Search.PropTypes = {
+class Search extends Component {
+  componentDidMount(){
+    if(this.input){
+      this.input.focus();
+    }
+  }
+  render(){
+    const { value, onChange, onSubmit, children } = this.props;
+    return(
+      <form onSubmit={onSubmit}>
+      <input
+        type="text"
+        value={value}
+        onChange={onChange}
+        ref = {(node) => this.input = node}/>
+        <button type="submit">
+          {children}
+        </button>
+    </form>  
+    )
+  }
+}
+ 
+Search.propTypes = {
    value: PropTypes.string,
    onChange: PropTypes.func.isRequired,
    onSubmit: PropTypes.func.isRequired,
@@ -150,7 +165,7 @@ Search.PropTypes = {
       )};
     </div>
 
-    Table.PropTypes = {
+    Table.propTypes = {
       list: PropTypes.arrayOf(
         PropTypes.shape({
           objectID: PropTypes.string.isRequired,
@@ -172,13 +187,26 @@ const Button = ({onClick, className , children}) =>
   </button>
 
 Button.defaultProps = {
-  className = 'btn btn-default'
+  className: 'btn btn-default'
 }
-Button.PropTypes = {
+
+Button.propTypes = {
   onClick: PropTypes.func.isRequired,
   className: PropTypes.string,
   children: PropTypes.node.isRequired,
 }
+
+const Loading = () => 
+  <div>Loading...</div>
+
+const withLoading = (Component) => ({isLoading, ...rest}) => (
+  isLoading  
+  ? <Loading />
+  : <Component {...rest} />
+)
+
+const ButtonWithLoading = withLoading(Button);
+
 export default App;
 
 export {Button, Search, Table};
