@@ -154,8 +154,8 @@ class Search extends Component {
  
 Search.propTypes = {
    value: PropTypes.string,
-   onChange: PropTypes.func.isRequired,
-   onSubmit: PropTypes.func.isRequired,
+   onChange: PropTypes.func,
+   onSubmit: PropTypes.func
 }
   
   const Table = ({ list, sortKey, onSort, onDismiss, isSortReverse}) => {
@@ -239,7 +239,7 @@ Search.propTypes = {
           points:PropTypes.number,
         }).isRequired
       ),
-      onDismiss: PropTypes.func.isRequired,
+      onDismiss: PropTypes.func,
     }
     
 const Button = ({onClick, className , children}) =>
