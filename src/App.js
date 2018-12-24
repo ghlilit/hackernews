@@ -27,10 +27,10 @@ export const updateSearchTopStoriesState = (hits, page) => prevState => {
   
 const updatedHits = [...oldHits, ...hits];
     return {
+       isLoading: false,
        results: {
         ...results,
         [searchKey]: { hits: updatedHits, page },
-        isLoading: false
       }  
     };
 }
@@ -94,7 +94,7 @@ class App extends Component {
     }
     
     render() {
-      const {searchTerm, results, searchKey, error, isLoading, sortKey, isSortReverse} = this.state;
+      const {searchTerm, results, searchKey, error, isLoading} = this.state;
       const page = (results && results[searchKey] && results[searchKey].page) || 0 ;
       const list = (results && results[searchKey] && results[searchKey].hits) || [] ;
       return (
