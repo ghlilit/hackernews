@@ -1,5 +1,5 @@
 # The Road to learn React
-This project is a Hackernews clone from The Road to Learn React Book 
+This project is a Hackernews clone from The Road to Learn React Book.<br>
 Check it out at (https://leanpub.com/the-road-to-learn-react)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
